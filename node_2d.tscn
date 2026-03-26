@@ -1,0 +1,38 @@
+[gd_scene format=4 uid="uid://ficyrr6qml2b"]
+
+[ext_resource type="Texture2D" uid="uid://bakq8f5ksycvx" path="res://icon.svg" id="1_wtcfe"]
+[ext_resource type="Texture2D" uid="uid://7eu43orfkkv3" path="res://icon2.svg" id="2_0e48y"]
+[ext_resource type="Script" uid="uid://ctkdnk4664v2d" path="res://drone.gd" id="2_epypp"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0e48y"]
+texture = ExtResource("1_wtcfe")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+1:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_y32ns"]
+resource_local_to_scene = true
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_0e48y")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wtcfe"]
+size = Vector2(128, 128)
+
+[node name="Node2D" type="Node2D" unique_id=1156183023]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=2141769796]
+position = Vector2(-0.44335938, 0.31811523)
+tile_map_data = PackedByteArray("AAD/////AAAAAAAAAAD//wAAAAAAAAEAAAAAAP//AAABAAAAAAAAAAAAAAABAAEAAAD9//3/AAAAAAAAAAD9//7/AAAAAAEAAAD+//3/AAABAAAAAAD+//7/AAABAAEAAAABAAEAAAAAAAAAAAABAAIAAAAAAAEAAAACAAEAAAABAAAAAAACAAIAAAABAAEAAAABAP//AAAAAAAAAAABAAAAAAAAAAEAAAACAP//AAABAAAAAAACAAAAAAABAAEAAAABAP3/AAAAAAAAAAABAP7/AAAAAAEAAAACAP3/AAABAAAAAAACAP7/AAABAAEAAAD///3/AAAAAAAAAAD///7/AAAAAAEAAAAAAP3/AAABAAAAAAAAAP7/AAABAAEAAAD9////AAAAAAAAAAD9/wAAAAAAAAEAAAD+////AAABAAAAAAD+/wAAAAABAAEAAAD9/wEAAAAAAAAAAAD9/wIAAAAAAAEAAAD+/wEAAAABAAAAAAD+/wIAAAABAAEAAAD//wEAAAAAAAAAAAD//wIAAAAAAAEAAAAAAAEAAAABAAAAAAAAAAIAAAABAAEAAAA=")
+tile_set = SubResource("TileSet_y32ns")
+
+[node name="drone" type="CharacterBody2D" parent="." unique_id=1255544875]
+script = ExtResource("2_epypp")
+
+[node name="Sprite2D" type="Sprite2D" parent="drone" unique_id=669179413]
+rotation = 3.1415927
+texture = ExtResource("2_0e48y")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="drone" unique_id=318722863]
+shape = SubResource("RectangleShape2D_wtcfe")
