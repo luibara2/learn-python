@@ -1,0 +1,85 @@
+[gd_scene load_steps=3 format=4 uid="uid://bqj8farmmain001"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_main"]
+[ext_resource type="Script" path="res://game/farm_view.gd" id="2_farm"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="VBoxMain" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="InventoryLabel" type="Label" parent="VBoxMain"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Hay: 0   Wheat: 0   Carrot: 0"
+horizontal_alignment = 1
+
+[node name="HBox" type="HBoxContainer" parent="VBoxMain"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="CodeCol" type="VBoxContainer" parent="VBoxMain/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(420, 0)
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="VBoxMain/HBox/CodeCol"]
+layout_mode = 2
+text = "Program the drone (Python-style: if / while / def — indent with 4 spaces)"
+
+[node name="CodeEdit" type="TextEdit" parent="VBoxMain/HBox/CodeCol"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 280)
+placeholder_text = "# Write your script here"
+
+[node name="BtnRow" type="HBoxContainer" parent="VBoxMain/HBox/CodeCol"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RunBtn" type="Button" parent="VBoxMain/HBox/CodeCol/BtnRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Run"
+
+[node name="StopBtn" type="Button" parent="VBoxMain/HBox/CodeCol/BtnRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Stop"
+
+[node name="Output" type="TextEdit" parent="VBoxMain/HBox/CodeCol"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 100)
+editable = false
+wrap_mode = 1
+
+[node name="FarmPanel" type="PanelContainer" parent="VBoxMain/HBox"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="FarmView" type="Control" parent="VBoxMain/HBox/FarmPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(448, 448)
+script = ExtResource("2_farm")
