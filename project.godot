@@ -11,7 +11,9 @@ config_version=5
 [application]
 
 config/name="Learn Python"
-run/main_scene="res://main.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="LearnPythonFarm"
+run/main_scene="res://app.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 

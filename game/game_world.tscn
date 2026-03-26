@@ -1,0 +1,103 @@
+[gd_scene load_steps=3 format=3 uid="uid://gameworld001"]
+
+[ext_resource type="Script" path="res://game/game_session.gd" id="1_gs"]
+[ext_resource type="Script" path="res://game/farm_view.gd" id="2_fv"]
+
+[node name="GameWorld" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gs")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.38, 0.45, 0.55, 1)
+
+[node name="VBoxRoot" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="TopBar" type="HBoxContainer" parent="VBoxRoot"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="InvLabel" type="Label" parent="VBoxRoot/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hay: 0   Wheat: 0   Carrot: 0"
+
+[node name="SaveBtn" type="Button" parent="VBoxRoot/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save"
+
+[node name="MenuBtn" type="Button" parent="VBoxRoot/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Menu"
+
+[node name="TopSpacer" type="Control" parent="VBoxRoot/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddNodeBtn" type="Button" parent="VBoxRoot/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "+"
+
+[node name="MainArea" type="HBoxContainer" parent="VBoxRoot"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="CodeWindowsRoot" type="Control" parent="VBoxRoot/MainArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+clip_contents = false
+
+[node name="FarmColumn" type="VBoxContainer" parent="VBoxRoot/MainArea"]
+layout_mode = 2
+custom_minimum_size = Vector2(440, 0)
+size_flags_vertical = 3
+
+[node name="FarmHolder" type="Control" parent="VBoxRoot/MainArea/FarmColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="FarmView" type="Control" parent="VBoxRoot/MainArea/FarmColumn/FarmHolder"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(472, 500)
+isometric = false
+show_compass_labels = true
+script = ExtResource("2_fv")
+
+[node name="OutputPanel" type="PanelContainer" parent="VBoxRoot"]
+layout_mode = 2
+
+[node name="OutputText" type="TextEdit" parent="VBoxRoot/OutputPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+editable = false
+wrap_mode = 1

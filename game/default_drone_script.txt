@@ -1,0 +1,10 @@
+# Till, plant, harvest — then walk east and repeat once.
+till()
+plant(Entities.WHEAT)
+harvest()
+
+move('east')
+
+if get_ground() == Grounds.GRASS:
+	till()
+	plant(Entities.WHEAT)

@@ -1,0 +1,185 @@
+[gd_scene format=3 uid="uid://dng1hl4rlcaii"]
+
+[ext_resource type="Script" path="res://app.gd" id="1_app"]
+[ext_resource type="PackedScene" path="res://game/game_world.tscn" id="2_gw"]
+
+[node name="App" type="Node"]
+script = ExtResource("1_app")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MainMenu" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BG" type="ColorRect" parent="CanvasLayer/MainMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.38, 0.45, 0.55, 1)
+
+[node name="Center" type="CenterContainer" parent="CanvasLayer/MainMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/MainMenu/Center"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="CanvasLayer/MainMenu/Center/VBox"]
+layout_mode = 2
+text = "Learn Python — Farm"
+horizontal_alignment = 1
+
+[node name="StartBtn" type="Button" parent="CanvasLayer/MainMenu/Center/VBox"]
+layout_mode = 2
+text = "Start"
+
+[node name="LoadBtn" type="Button" parent="CanvasLayer/MainMenu/Center/VBox"]
+layout_mode = 2
+text = "Load / New / Delete"
+
+[node name="SaveBtn" type="Button" parent="CanvasLayer/MainMenu/Center/VBox"]
+layout_mode = 2
+text = "Save (in game)"
+
+[node name="OptionsBtn" type="Button" parent="CanvasLayer/MainMenu/Center/VBox"]
+layout_mode = 2
+text = "Options"
+
+[node name="QuitBtn" type="Button" parent="CanvasLayer/MainMenu/Center/VBox"]
+layout_mode = 2
+text = "Quit"
+
+[node name="SlotPanel" type="Control" parent="CanvasLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BG2" type="ColorRect" parent="CanvasLayer/SlotPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.28, 0.34, 0.42, 1)
+
+[node name="Center" type="CenterContainer" parent="CanvasLayer/SlotPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/SlotPanel/Center"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="CanvasLayer/SlotPanel/Center/VBox"]
+layout_mode = 2
+text = "Saves (each folder under user://saves/)"
+
+[node name="SlotList" type="ItemList" parent="CanvasLayer/SlotPanel/Center/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 200)
+layout_mode = 2
+
+[node name="HBoxNew" type="HBoxContainer" parent="CanvasLayer/SlotPanel/Center/VBox"]
+layout_mode = 2
+
+[node name="NewSaveName" type="LineEdit" parent="CanvasLayer/SlotPanel/Center/VBox/HBoxNew"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "new save name"
+
+[node name="NewBtn" type="Button" parent="CanvasLayer/SlotPanel/Center/VBox/HBoxNew"]
+layout_mode = 2
+text = "New"
+
+[node name="HBoxLoad" type="HBoxContainer" parent="CanvasLayer/SlotPanel/Center/VBox"]
+layout_mode = 2
+
+[node name="LoadBtn" type="Button" parent="CanvasLayer/SlotPanel/Center/VBox/HBoxLoad"]
+layout_mode = 2
+text = "Load selected"
+
+[node name="HBoxDel" type="HBoxContainer" parent="CanvasLayer/SlotPanel/Center/VBox"]
+layout_mode = 2
+
+[node name="DeleteBtn" type="Button" parent="CanvasLayer/SlotPanel/Center/VBox/HBoxDel"]
+layout_mode = 2
+text = "Delete selected"
+
+[node name="BackBtn" type="Button" parent="CanvasLayer/SlotPanel/Center/VBox"]
+layout_mode = 2
+text = "Back"
+
+[node name="OptionsPanel" type="Control" parent="CanvasLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BG3" type="ColorRect" parent="CanvasLayer/OptionsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.22, 0.28, 0.92)
+
+[node name="Center" type="CenterContainer" parent="CanvasLayer/OptionsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/OptionsPanel/Center"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="OLabel" type="Label" parent="CanvasLayer/OptionsPanel/Center/VBox"]
+layout_mode = 2
+text = "Options"
+
+[node name="FullscreenCheck" type="CheckButton" parent="CanvasLayer/OptionsPanel/Center/VBox"]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="FpsOption" type="OptionButton" parent="CanvasLayer/OptionsPanel/Center/VBox"]
+layout_mode = 2
+
+[node name="AutosaveCheck" type="CheckButton" parent="CanvasLayer/OptionsPanel/Center/VBox"]
+layout_mode = 2
+text = "Autosave (periodic)"
+
+[node name="CloseOptsBtn" type="Button" parent="CanvasLayer/OptionsPanel/Center/VBox"]
+layout_mode = 2
+text = "Close"
+
+[node name="GameWorld" parent="." instance=ExtResource("2_gw")]
+visible = false
