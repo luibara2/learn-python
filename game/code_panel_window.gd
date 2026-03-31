@@ -10,6 +10,9 @@ var node_id: String = ""
 var py_filename: String = ""
 var _ui: Control
 var _collapsed: bool = false
+## Full panel size when expanded; kept while collapsed for save/restore.
+var _expanded_size: Vector2 = Vector2(480, 340)
+var world_pos: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -30,9 +33,11 @@ func _apply_payload() -> void:
 	if pos_arr is Array and (pos_arr as Array).size() >= 2:
 		px = float((pos_arr as Array)[0])
 		py = float((pos_arr as Array)[1])
-	position = Vector2(px, py)
-	custom_minimum_size = Vector2(pw, ph)
-	size = custom_minimum_size
+	world_pos = Vector2(px, py)
+	position = world_pos
+	_expanded_size = Vector2(float(pw), float(ph))
+	custom_minimum_size = _expanded_size
+	size = _expanded_size
 	_collapsed = bool(setup_payload.get("collapsed", false))
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
@@ -64,6 +69,23 @@ func _build_ui() -> void:
 	ui_root.name_submitted.connect(_on_name_submitted)
 	ui_root.title_drag_start.connect(func(_p: Vector2) -> void: move_to_front())
 	ui_root.title_drag_relative.connect(_on_title_drag_relative)
+	ui_root.code_changed_by_user.connect(_on_code_changed_by_user)
+
+	if _collapsed:
+		call_deferred("_sync_window_size_to_collapse_state")
+
+
+func _sync_window_size_to_collapse_state() -> void:
+	if _ui == null:
+		return
+	if _collapsed:
+		var inner_h: float = _ui.get_collapsed_inner_height()
+		var h: float = maxf(inner_h + 8.0, 28.0)
+		custom_minimum_size = Vector2(_expanded_size.x, h)
+		size = custom_minimum_size
+	else:
+		custom_minimum_size = _expanded_size
+		size = _expanded_size
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -83,15 +105,23 @@ func refresh_name_label() -> void:
 
 
 func to_save_node_dict() -> Dictionary:
-	var sz: Vector2 = size if size.length_squared() > 10.0 else custom_minimum_size
+	var w: int
+	var h: int
+	if _collapsed:
+		w = int(roundf(_expanded_size.x))
+		h = int(roundf(_expanded_size.y))
+	else:
+		var sz: Vector2 = size if size.length_squared() > 10.0 else custom_minimum_size
+		w = int(roundf(sz.x))
+		h = int(roundf(sz.y))
 	return {
 		"id": node_id,
 		"name": (_ui.get_display_name() if _ui != null else _display_name_from_filename(py_filename)),
 		"filename": py_filename,
-		"pos": [position.x, position.y],
+		"pos": [world_pos.x, world_pos.y],
 		"collapsed": _collapsed,
-		"panel_w": int(roundf(sz.x)),
-		"panel_h": int(roundf(sz.y)),
+		"panel_w": w,
+		"panel_h": h,
 	}
 
 
@@ -111,6 +141,11 @@ func _on_run_pressed() -> void:
 		game_session.run_panel(self)
 
 
+func _on_code_changed_by_user() -> void:
+	if game_session:
+		game_session.stop_if_busy_from_code_edit()
+
+
 func _on_stop_pressed() -> void:
 	if game_session:
 		game_session.stop_interpreter()
@@ -122,9 +157,12 @@ func _on_close_pressed() -> void:
 
 
 func _on_minimize_pressed() -> void:
+	if not _collapsed:
+		_expanded_size = Vector2(size.x, size.y)
 	_collapsed = not _collapsed
 	if _ui:
 		_ui.set_collapsed(_collapsed)
+	_sync_window_size_to_collapse_state()
 
 
 func _on_name_submitted(new_name: String) -> void:
@@ -134,8 +172,14 @@ func _on_name_submitted(new_name: String) -> void:
 
 
 func _on_title_drag_relative(delta: Vector2) -> void:
-	position += delta
-	var pr: Control = get_parent() as Control
-	if pr:
-		position.x = clampf(position.x, -size.x + 40.0, pr.size.x - 40.0)
-		position.y = clampf(position.y, 0.0, maxf(0.0, pr.size.y - 48.0))
+	var zoom: float = 1.0
+	if game_session != null:
+		zoom = maxf(0.001, game_session.get_world_zoom())
+	world_pos += delta / zoom
+	position = world_pos
+
+
+func apply_camera_transform(camera_px: Vector2, zoom: float, zoom_pivot: Vector2) -> void:
+	var z: float = maxf(0.001, zoom)
+	scale = Vector2(z, z)
+	position = world_pos * z - camera_px + zoom_pivot * (1.0 - z)

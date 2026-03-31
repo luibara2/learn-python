@@ -39,6 +39,15 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="ErrorWarn" type="Label" parent="VBoxRoot/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "▲"
+modulate = Color(0.95, 0.2, 0.15, 1)
+tooltip_text = "A program error or problem occurred. Open Menu to read details."
+visible = false
+
 [node name="InvLabel" type="Label" parent="VBoxRoot/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -88,16 +97,8 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_vertical = 3
 custom_minimum_size = Vector2(472, 500)
-isometric = false
+isometric = true
+iso_tile_h = 14.0
+iso_cube_h = 28.0
 show_compass_labels = true
 script = ExtResource("2_fv")
-
-[node name="OutputPanel" type="PanelContainer" parent="VBoxRoot"]
-layout_mode = 2
-
-[node name="OutputText" type="TextEdit" parent="VBoxRoot/OutputPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(0, 120)
-editable = false
-wrap_mode = 1

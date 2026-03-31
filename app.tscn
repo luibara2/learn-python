@@ -58,6 +58,19 @@ text = "Save (in game)"
 layout_mode = 2
 text = "Options"
 
+[node name="MenuLogLabel" type="Label" parent="CanvasLayer/MainMenu/Center/VBox"]
+layout_mode = 2
+text = "Errors & output (last time you left the game)"
+horizontal_alignment = 1
+
+[node name="MenuLogText" type="TextEdit" parent="CanvasLayer/MainMenu/Center/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 120)
+layout_mode = 2
+editable = false
+wrap_mode = 1
+placeholder_text = "Return here from the game (Menu button) to see run output and errors."
+
 [node name="QuitBtn" type="Button" parent="CanvasLayer/MainMenu/Center/VBox"]
 layout_mode = 2
 text = "Quit"

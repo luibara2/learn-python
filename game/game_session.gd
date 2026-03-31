@@ -22,24 +22,41 @@ var _panels: Array[CodePanelWindow] = []
 @onready var code_windows_root: Control = $VBoxRoot/MainArea/CodeWindowsRoot
 @onready var farm_view: FarmView = $VBoxRoot/MainArea/FarmColumn/FarmHolder/FarmView as FarmView
 
-@onready var output_text: TextEdit = %OutputText
 @onready var inv_label: Label = %InvLabel
 @onready var save_btn: Button = %SaveBtn
 @onready var menu_btn: Button = %MenuBtn
 @onready var add_node_btn: Button = %AddNodeBtn
+@onready var error_warn: Label = %ErrorWarn
+
+## Mirrors former bottom output panel; shown on main menu after exit.
+var _session_log: String = ""
+var _error_notification: bool = false
 
 
 func _ready() -> void:
 	save_btn.pressed.connect(_on_save_pressed)
 	menu_btn.pressed.connect(_on_menu_pressed)
 	add_node_btn.pressed.connect(create_code_node)
+	code_windows_root.gui_input.connect(_on_code_windows_root_gui_input)
 	visible = false
 	set_process(false)
+
+
+func get_session_log() -> String:
+	return _session_log
+
+
+func clear_error_notification() -> void:
+	_error_notification = false
+	_update_error_warn()
 
 
 func start_session(p_slot: String, settings: SettingsStore) -> void:
 	slot_id = p_slot
 	_settings = settings
+	_session_log = ""
+	_error_notification = false
+	_update_error_warn()
 	visible = true
 	set_process(true)
 	if not _load_slot_data():
@@ -48,6 +65,14 @@ func start_session(p_slot: String, settings: SettingsStore) -> void:
 		requested_exit_to_menu.emit()
 		return
 	_wire_interpreter()
+
+
+func _on_code_windows_root_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mb: InputEventMouseButton = event
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
+			## Clicks on empty space (not on a panel) clear code-editor focus.
+			get_viewport().gui_release_focus()
 
 
 func end_session() -> void:
@@ -122,17 +147,24 @@ func _spawn_code_panel(node_data: Dictionary) -> void:
 	panel.game_session = self
 	code_windows_root.add_child(panel)
 	_panels.append(panel)
+	call_deferred("_sync_code_node_positions")
 
 
 func create_code_node() -> void:
 	var fn: String = SaveManager.unique_py_filename(slot_id, "node")
 	SaveManager.write_py(slot_id, fn, SaveManager.default_drone_source())
 	var n: int = _panels.size()
+	var fv: FarmView = _farm_view_node()
+	var cam_px: Vector2 = fv.get_camera_screen_offset()
+	var zoom: float = maxf(0.001, fv.get_camera_zoom())
+	var zoom_pivot: Vector2 = code_windows_root.size * 0.5
+	var spawn_screen: Vector2 = Vector2(24.0 + n * 28.0, 56.0 + n * 32.0)
+	var spawn_world: Vector2 = (spawn_screen - zoom_pivot * (1.0 - zoom) + cam_px) / zoom
 	var node_data: Dictionary = {
 		"id": SaveManager.new_node_id(),
 		"name": fn.get_basename(),
 		"filename": fn,
-		"pos": [24.0 + n * 28.0, 56.0 + n * 32.0],
+		"pos": [spawn_world.x, spawn_world.y],
 		"collapsed": false,
 		"panel_w": 480,
 		"panel_h": 340,
@@ -145,7 +177,9 @@ func _process(delta: float) -> void:
 	if _farm == null:
 		return
 	_farm.process_growth(delta)
-	_farm_view_node().queue_redraw()
+	var fv: FarmView = _farm_view_node()
+	fv.queue_redraw()
+	_sync_code_node_positions()
 	_refresh_inventory_ui()
 
 	if _settings != null and _settings.autosave:
@@ -155,9 +189,28 @@ func _process(delta: float) -> void:
 			save_to_disk()
 
 
+func _sync_code_node_positions() -> void:
+	var fv: FarmView = _farm_view_node()
+	if fv == null:
+		return
+	var cam_px: Vector2 = fv.get_camera_screen_offset()
+	var zoom: float = fv.get_camera_zoom()
+	var zoom_pivot: Vector2 = code_windows_root.size * 0.5
+	for p in _panels:
+		if p != null:
+			p.apply_camera_transform(cam_px, zoom, zoom_pivot)
+
+
+func get_world_zoom() -> float:
+	var fv: FarmView = _farm_view_node()
+	if fv == null:
+		return 1.0
+	return fv.get_camera_zoom()
+
+
 func request_close_panel(panel: CodePanelWindow) -> void:
 	if _panels.size() <= 1:
-		_on_log_line("Cannot delete the last code node.")
+		_append_session_line("Cannot delete the last code node.", true)
 		return
 	var idx: int = _panels.find(panel)
 	if idx < 0:
@@ -183,7 +236,7 @@ func rename_code_panel(panel: CodePanelWindow, new_name: String) -> void:
 	if taken:
 		new_fn = SaveManager.unique_py_filename(slot_id, base)
 	if not SaveManager.rename_py(slot_id, panel.py_filename, new_fn):
-		_on_log_line("Could not rename script file.")
+		_append_session_line("Could not rename script file.", true)
 		return
 	panel.py_filename = new_fn
 	panel.refresh_name_label()
@@ -196,7 +249,9 @@ func run_panel(panel: CodePanelWindow) -> void:
 	_busy = true
 	for p in _panels:
 		p.set_run_buttons_busy(true)
-	output_text.text = ""
+	_session_log = ""
+	_error_notification = false
+	_update_error_warn()
 
 	var src: String = panel.get_code_source()
 	SaveManager.write_py(slot_id, panel.py_filename, src)
@@ -220,25 +275,44 @@ func run_panel(panel: CodePanelWindow) -> void:
 
 
 func stop_interpreter() -> void:
-	_interp.stop()
+	if _interp != null:
+		_interp.stop()
+
+
+func stop_if_busy_from_code_edit() -> void:
+	if _busy:
+		stop_interpreter()
 
 
 func _finish_err(msg: String) -> void:
 	_busy = false
 	for p in _panels:
 		p.set_run_buttons_busy(false)
-	output_text.text = msg + "\n"
+	_append_session_line(msg, true)
 
 
 func _on_log_line(s: String) -> void:
-	output_text.text += s + "\n"
+	_append_session_line(s, false)
 
 
 func _on_finished(ok: bool, message: String) -> void:
 	_busy = false
 	for p in _panels:
 		p.set_run_buttons_busy(false)
-	output_text.text += "[%s] %s\n" % ["ok" if ok else "error", message]
+	var line: String = "[%s] %s" % ["ok" if ok else "error", message]
+	_append_session_line(line, not ok)
+
+
+func _append_session_line(s: String, is_error: bool) -> void:
+	_session_log += s + "\n"
+	if is_error:
+		_error_notification = true
+	_update_error_warn()
+
+
+func _update_error_warn() -> void:
+	if error_warn != null:
+		error_warn.visible = _error_notification
 
 
 func _refresh_inventory_ui() -> void:
@@ -279,11 +353,12 @@ func save_to_disk() -> void:
 
 func _on_save_pressed() -> void:
 	save_to_disk()
-	_on_log_line("(saved)")
+	_append_session_line("(saved)", false)
 
 
 func _on_menu_pressed() -> void:
 	save_to_disk()
+	_append_session_line("(saved)", false)
 	requested_exit_to_menu.emit()
 
 

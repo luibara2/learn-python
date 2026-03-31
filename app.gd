@@ -9,6 +9,7 @@ var _settings: SettingsStore = SettingsStore.new()
 
 @onready var _slot_list: ItemList = %SlotList
 @onready var _new_save_name: LineEdit = %NewSaveName
+@onready var _menu_log_text: TextEdit = %MenuLogText
 
 
 func _ready() -> void:
@@ -150,6 +151,13 @@ func _begin_play(slot_name: String) -> void:
 
 
 func _on_exit_to_menu() -> void:
+	var log: String = ""
+	if _game_world.has_method("get_session_log"):
+		log = _game_world.get_session_log()
+	if _game_world.has_method("clear_error_notification"):
+		_game_world.clear_error_notification()
 	_game_world.end_session()
 	_game_world.visible = false
 	_main_menu.visible = true
+	if _menu_log_text != null:
+		_menu_log_text.text = log

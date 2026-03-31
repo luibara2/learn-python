@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://codepanelcontent01"]
+[gd_scene load_steps=3 format=3 uid="uid://codepanelcontent01"]
 
 [ext_resource type="Script" path="res://ui/code_panel_content.gd" id="1_script"]
+[ext_resource type="Script" path="res://ui/python_code_edit.gd" id="2_pyedit"]
 
 [node name="Root" type="Control"]
 layout_mode = 3
@@ -71,3 +72,4 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 placeholder_text = "# Your script"
+script = ExtResource("2_pyedit")

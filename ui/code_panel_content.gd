@@ -9,10 +9,12 @@ signal title_drag_start(local_pos: Vector2)
 ## Screen-space delta while dragging the title strip (2D panels only).
 signal title_drag_relative(delta: Vector2)
 signal name_submitted(new_display_name: String)
+signal code_changed_by_user
 
 @onready var drag_handle: ColorRect = %DragHandle
+@onready var title_bar: PanelContainer = %TitleBar
 @onready var name_edit: LineEdit = %NameEdit
-@onready var code_edit: TextEdit = %CodeEdit
+@onready var code_edit: PythonCodeEdit = %CodeEdit
 @onready var run_btn: Button = %RunBtn
 @onready var stop_btn: Button = %StopBtn
 @onready var min_btn: Button = %MinBtn
@@ -30,6 +32,7 @@ func _ready() -> void:
 	name_edit.text_submitted.connect(_on_name_submitted)
 	name_edit.focus_exited.connect(_on_name_focus_out)
 	drag_handle.gui_input.connect(_on_drag_handle_gui)
+	code_edit.modified_by_user.connect(func(): code_changed_by_user.emit())
 
 
 func set_display_name(n: String) -> void:
@@ -41,7 +44,7 @@ func get_display_name() -> String:
 
 
 func set_source(text: String) -> void:
-	code_edit.text = text
+	code_edit.set_programmatic_text(text)
 
 
 func get_source() -> String:
@@ -55,6 +58,12 @@ func set_running(running: bool) -> void:
 
 func set_collapsed(c: bool) -> void:
 	body.visible = not c
+
+
+func get_collapsed_inner_height() -> float:
+	if title_bar != null:
+		return title_bar.get_combined_minimum_size().y
+	return 36.0
 
 
 func append_output(line: String) -> void:
