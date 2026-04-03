@@ -299,8 +299,14 @@ func _on_finished(ok: bool, message: String) -> void:
 	_busy = false
 	for p in _panels:
 		p.set_run_buttons_busy(false)
-	var line: String = "[%s] %s" % ["ok" if ok else "error", message]
-	_append_session_line(line, not ok)
+	if ok:
+		_append_session_line("[ok] %s" % message, false)
+		return
+	## Matches interpreter.gd after cancel (Stop button or edit while running).
+	if message == "Stopped.":
+		_append_session_line("[stopped] Stopped.", false)
+		return
+	_append_session_line("[error] %s" % message, true)
 
 
 func _append_session_line(s: String, is_error: bool) -> void:

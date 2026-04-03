@@ -157,7 +157,12 @@ func _on_log_line(s: String) -> void:
 func _on_finished(ok: bool, message: String) -> void:
 	_busy = false
 	_run_btn.disabled = false
-	_out.text += "[%s] %s\n" % ["ok" if ok else "error", message]
+	if ok:
+		_out.text += "[ok] %s\n" % message
+	elif message == "Stopped.":
+		_out.text += "[stopped] Stopped.\n"
+	else:
+		_out.text += "[error] %s\n" % message
 
 
 func _on_stop() -> void:
